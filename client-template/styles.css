@@ -1,0 +1,86 @@
+
+*:focus {
+	outline: none;
+}
+
+a {
+	cursor: pointer;
+	text-decoration: none;
+}
+
+html, body {
+	height: 100%;
+	background-color: rgba(37, 99, 152, 0.4);
+	line-height: 1.5;
+	text-align: center;
+	font-family: sans-serif;
+}
+
+#content {
+	min-height: calc(100% - 50px);
+}
+
+#content > p {
+	margin: 50px;
+	font-size: 120%;
+}
+
+#logo {
+    padding: 0;
+    margin: 0 auto;
+    display: block;
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.buttons {
+	display: inline-flex;
+}
+@media only screen and (max-width: 300px) {
+	.buttons {
+		display: grid;
+	}
+}
+
+.buttons > a {
+	border-radius: 4px;
+	border: transparent;
+	margin: 10px;
+	padding: 1.5em 2em;
+	color: rgba(0,0,0,.8);
+	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+#accept {
+	background: rgb(28, 184, 65);
+}
+
+#reject {
+	background: rgb(202, 60, 60);
+}
+
+#accept:hover, #reject:hover {
+	opacity: 0.50;
+	box-shadow: 3px 3px 3px black;
+}
+
+footer {
+	height: 50px;
+	display: flex;
+	position: relative;
+	background-color: black;
+	align-items: center;
+	justify-content: center;
+}
+
+footer > p {
+	color: white;
+	opacity: 0.6;
+}
+
+footer > p > a {
+	color: rgba(0, 147, 255, 0.9);
+}
+footer > p > a:hover {
+	color: rgba(0, 147, 255, 0.75);
+}

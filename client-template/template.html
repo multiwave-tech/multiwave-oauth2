@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Multiwave's access request</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" type="image/x-icon" href="https://oauth.net/images/oauth-2-sm.png" />
+
+    <style>
+        a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:after,blockquote:before,q:after,q:before{content:'';content:none}table{border-collapse:collapse;border-spacing:0}
+        *:focus{outline:none}a{cursor:pointer;text-decoration:none}body,html{height:100%;background-color:rgba(37, 99, 152, 0.4);line-height:1.5;text-align:center;font-family:sans-serif}#content{min-height:calc(100% - 50px);}#content > p{margin:30px;font-size:120%}#logo{padding:0;margin:0 auto;display:block;max-height:100%;max-width:100%}.buttons{display:inline-flex}@media only screen and (max-width: 300px){.buttons{display:grid}}.buttons > a{border-radius:4px;border:transparent;margin:10px;padding:1.5em 2em;color:rgba(0,0,0,.8);text-shadow:0 1px 1px rgba(0, 0, 0, 0.2)}#accept{background:rgb(28, 184, 65)}#reject{background:rgb(202, 60, 60)}#accept:hover,#reject:hover{opacity:0.50;box-shadow:3px 3px 3px black}footer{height:50px;display:flex;position:relative;background-color:black;align-items:center;justify-content:center;white-space:nowrap;overflow-x:hidden}footer > p{color:white;opacity:0.6}footer > p > a{color:rgba(0, 147, 255, 0.9)}footer > p > a:hover{color:rgba(0, 147, 255, 0.75)}
+    </style>
+</head>
+<body>
+    <div id="content">
+        <!-- Change to HTTPS here and into the <footer> when it'll be fixed -->
+        <img id="logo" alt="Multiwave's logo" src="http://www.multiwave.ch/wp-content/themes/altitude-pro/images/logo-home-multiwave.png" />
+        <p>This application is requesting some permissions from your account, are you sure you want to continue ?</p>
+        <div class="buttons">
+            <a id="accept" href="{url}&confirm=yes">Accept</a>
+            <a id="reject" href="{url}&confirm=no">Reject</a>
+        </div>
+    </div>
+    <footer>
+        <p>Made with &hearts; by <a target="_blank" href="https://horlogeskynet.github.io">Samuel FORESTIER</a> for <a target="_blank" href="http://multiwave.ch">MULTIWAVE TECHNOLOGIES AG</a> &mdash; All rights reserved &mdash; 2017</p>
+    </footer>
+</body>
+</html>
