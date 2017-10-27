@@ -8,7 +8,7 @@ We'll be using _Python_, so let's work something out with the [Python-OAuth2](ht
 	```sh
 	# Some dependencies
 	aptitude install apt-transport-https ca-certificates curl gnupg2 software-properties-common sysfsutils python3 python3-pip git
-	pip3 install python-oauth2 redis
+	pip3 install python-oauth2 redis requests
 	# Some system tweaking
 	sysctl vm.overcommit_memory=1
 	echo 'kernel/mm/transparent_hugepage/enabled = never' >> /etc/sysfs.conf
@@ -50,7 +50,8 @@ We'll be using _Python_, so let's work something out with the [Python-OAuth2](ht
 				"client_id": "abc",
 				"client_secret": "xyz",
 				"redirect_uris": [
-					"http://localhost:8081/callback"
+					"http://localhost:8081/callback",
+					"http://localhost:8081/"
 				]
 			}
 		]
@@ -59,8 +60,14 @@ We'll be using _Python_, so let's work something out with the [Python-OAuth2](ht
 
 4. Now, we're all set to run it :
 	```sh
-	chmod +x run.sh
-	./run.sh
+	# Run the server
+	python3 oauth2-server/server.py
+	# Run the AuthorizationCodeGrant test client
+	python3 tests-clients/client_AuthorizationCode.py
+	# Run the ImplicitGrant test client
+	python3 tests-clients/client_Implicit.py
+	# Run the CredentialsGrant test client
+	python3 tests-clients/client_CredentialsGrant.py
 	```
 
 4. To bind this new server to the 443 port, you could use an _Apache_ or _NGINX_ reverse proxy `your_public_IP:443 <=> 127.0.0.1:8080`.
@@ -68,4 +75,4 @@ We'll be using _Python_, so let's work something out with the [Python-OAuth2](ht
 ## Acknowledgment
 
 This code uses and relies on the [Markus Meyer's _python-oauth2_ library](https://github.com/wndhydrnt/python-oauth2).  
-The sources you'll encounter there are more or less the [`authentication_code_grant.py`](https://github.com/wndhydrnt/python-oauth2/blob/master/docs/examples/authorization_code_grant.py) library example, re-factored and puzzled for maintainability reasons.
+The sources you'll encounter there are more or less the [library examples](https://github.com/wndhydrnt/python-oauth2/blob/master/docs/examples/), re-factored and puzzled for maintainability reasons.
