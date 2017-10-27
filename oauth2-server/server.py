@@ -1,32 +1,21 @@
 #!/usr/bin/env python3
 
 
-import os
-import json
 import logging
-import threading
+import json
+import os
 
-from urllib.request import urlopen
-from urllib.parse import urlencode, parse_qs
-
-from wsgiref.simple_server import make_server, WSGIRequestHandler
+from wsgiref.simple_server import WSGIRequestHandler, make_server
 
 from oauth2 import Provider
 from oauth2.error import UserNotAuthenticated
 from oauth2.store.redisdb import ClientStore, TokenStore
 from oauth2.tokengenerator import Uuid4
-from oauth2.web import AuthorizationCodeGrantSiteAdapter
+from oauth2.web import AuthorizationCodeGrantSiteAdapter, \
+    ImplicitGrantSiteAdapter
 from oauth2.web.wsgi import Application
-from oauth2.grant import AuthorizationCodeGrant
-
-
-class ClientRequestHandler(WSGIRequestHandler):
-    """
-    Request handler that enables formatting of the log messages on the console.
-    This handler is used by the client application.
-    """
-    def address_string(self):
-        return "CLIENT APP"
+from oauth2.grant import AuthorizationCodeGrant, ImplicitGrant, \
+    RefreshToken, ClientCredentialsGrant
 
 
 class OAuthRequestHandler(WSGIRequestHandler):
@@ -38,12 +27,13 @@ class OAuthRequestHandler(WSGIRequestHandler):
         return "MULTIWAVE OAuth2.0"
 
 
-class TestSiteAdapter(AuthorizationCodeGrantSiteAdapter):
+class TestSiteAdapter(
+    AuthorizationCodeGrantSiteAdapter,
+        ImplicitGrantSiteAdapter):
     """
     This adapter renders a confirmation page so the user can confirm the auth
     request.
     """
-
     CONFIRMATION_TEMPLATE = """
         <!DOCTYPE html>
         <html>
@@ -78,125 +68,8 @@ class TestSiteAdapter(AuthorizationCodeGrantSiteAdapter):
             return False
 
 
-class ClientApplication():
-    """
-    Very basic application that simulates calls to the API of the
-    python-oauth2 app.
-    """
-    callback_url = 'http://localhost:8081/callback'
-    client_id = 'abc'
-    client_secret = 'xyz'
-    api_server_url = 'http://localhost:8080'
-
+class RunAuthServer():
     def __init__(self):
-        self.access_token = None
-        self.auth_token = None
-        self.token_type = ''
-
-    def __call__(self, env, start_response):
-        if env['PATH_INFO'] == '/app':
-            status, body, headers = self._serve_application(env)
-        elif env['PATH_INFO'] == '/callback':
-            status, body, headers = self._read_auth_token(env)
-        else:
-            status = "301 Moved"
-            body = ''
-            headers = {'Location': '/app'}
-
-        start_response(status, list(headers.items()))
-
-        return [body.encode()]
-
-    def _request_access_token(self):
-        print("Requesting access token...")
-
-        post_params = {
-            'client_id': self.client_id,
-            'client_secret': self.client_secret,
-            'code': self.auth_token,
-            'grant_type': 'authorization_code',
-            'redirect_uri': self.callback_url
-        }
-
-        result = json.loads(''.join(i.decode() for i in
-                            urlopen(self.api_server_url + '/token',
-                            urlencode(post_params).encode())))
-
-        self.access_token = result['access_token']
-        self.token_type = result['token_type']
-
-        print("Received access token '%s' of type '%s'" % (
-                        self.access_token, self.token_type))
-
-        return "302 Found", '', {'Location': '/app'}
-
-    def _read_auth_token(self, env):
-        print("Receiving authorization token...")
-
-        query_params = parse_qs(env['QUERY_STRING'])
-
-        if 'error' in query_params:
-            location = '/app?error=' + query_params['error'][0]
-            return "302 Found", '', {'Location': location}
-
-        self.auth_token = query_params['code'][0]
-
-        print("Received temporary authorization token '%s'" % (
-                self.auth_token,))
-
-        return "302 Found", '', {'Location': '/app'}
-
-    def _request_auth_token(self):
-        print("Requesting authorization token...")
-
-        auth_endpoint = self.api_server_url + '/authorize'
-        query = urlencode({'client_id': 'abc',
-                           'redirect_uri': self.callback_url,
-                           'response_type': 'code'})
-
-        return "302 Found", '', {'Location': auth_endpoint + '?' + query}
-
-    def _serve_application(self, env):
-        query_params = parse_qs(env['QUERY_STRING'])
-
-        if 'error' in query_params and query_params['error'][0] \
-                == 'access_denied':
-            return "200 OK", "User has denied access.", {}
-
-        if not self.access_token:
-            if not self.auth_token:
-                return self._request_auth_token()
-            else:
-                return self._request_access_token()
-        else:
-            confirmation = "Current access token '%s' of type '%s'" % (
-                            self.access_token, self.token_type)
-
-            return "200 OK", confirmation, {}
-
-
-class RunAppServer(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-
-    def run(self):
-        self.app = ClientApplication()
-
-        try:
-            self.httpd = make_server('', 8081, self.app,
-                                     handler_class=ClientRequestHandler)
-
-            print("Starting Client app on http://localhost:8081/...")
-            self.httpd.serve_forever()
-
-        except KeyboardInterrupt:
-            self.httpd.server_close()
-
-
-class RunAuthServer(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-
         try:
             with open('oauth2-server/config/config.json') as file:
                 self.config = json.load(file)
@@ -242,6 +115,18 @@ class RunAuthServer(threading.Thread):
         self.provider.add_grant(
             AuthorizationCodeGrant(site_adapter=TestSiteAdapter())
         )
+        # But implicit grant too !
+        self.provider.add_grant(
+            ImplicitGrant(site_adapter=TestSiteAdapter())
+        )
+        # # Refresh token (still to test)
+        self.provider.add_grant(
+            RefreshToken(expires_in=2592000)
+        )
+        # Simple client credentials grant (see the test file)
+        self.provider.add_grant(
+            ClientCredentialsGrant()
+        )
 
         # We're all set up, let's run a HTTP server
         self.httpd = make_server(self.config['auth_server']['host'],
@@ -249,9 +134,9 @@ class RunAuthServer(threading.Thread):
                                  Application(provider=self.provider),
                                  handler_class=OAuthRequestHandler)
 
-        print("Starting OAuth2 server on http://" +
+        print("Starting OAuth2 server on <http://" +
               self.config['auth_server']['host'] + ':' +
-              str(self.config['auth_server']['port']) + "...")
+              str(self.config['auth_server']['port']) + ">...")
 
         try:
             self.httpd.serve_forever()
@@ -263,11 +148,4 @@ class RunAuthServer(threading.Thread):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
 
-    auth_server = RunAppServer()
-    auth_server.start()
-
-    app_server = RunAuthServer()
-    app_server.start()
-
-    auth_server.join()
-    app_server.join()
+    RunAuthServer().run()
