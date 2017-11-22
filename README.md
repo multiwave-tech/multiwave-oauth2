@@ -8,7 +8,9 @@ We'll be using _Python_, so let's work something out with the [Python-OAuth2](ht
 	```sh
 	# Some dependencies
 	aptitude install apt-transport-https ca-certificates curl gnupg2 software-properties-common sysfsutils python3 python3-pip git
-	pip3 install python-oauth2 redis requests
+	pip3 install -r requirements.txt
+    # if python-oauth2 is not available in v2.0.0 use this to install current master
+    pip install git+https://github.com/wndhydrnt/python-oauth2.git
 	# Some system tweaking
 	sysctl vm.overcommit_memory=1
 	echo 'kernel/mm/transparent_hugepage/enabled = never' >> /etc/sysfs.conf
