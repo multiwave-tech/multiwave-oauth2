@@ -23,21 +23,18 @@ class ClientApplication():
     Very basic application that simulates calls to the API of the
     python-oauth2 app.
     """
-    def __init__(self):
+    def __init__(self, config):
         self.access_token = None
         self.auth_token = None
         self.token_type = ''
 
-        # Retrieve configuration from server's sources for our tests
-        with open('oauth2-server/config/config.json') as file:
-            config = json.load(file)
-            self.callback_url = config['clients'][0]['redirect_uris'][0]
-            self.client_id = config['clients'][0]['client_id']
-            self.client_secret = config['clients'][0]['client_secret']
-            self.api_server_url = 'http://{0}:{1}'.format(
-                config['auth_server']['host'],
-                config['auth_server']['port']
-            )
+        self.callback_url = config['clients'][0]['redirect_uris'][0]
+        self.client_id = config['clients'][0]['client_id']
+        self.client_secret = config['clients'][0]['client_secret']
+        self.api_server_url = 'http://{0}:{1}'.format(
+            config['auth_server']['host'],
+            config['auth_server']['port']
+        )
 
     def __call__(self, env, start_response):
         if env['PATH_INFO'] == '/app':
@@ -123,10 +120,18 @@ class ClientApplication():
 
 class RunAppServer():
     def run(self):
+        # Retrieve configuration from server's sources for our tests
+        with open('oauth2-server/config/config.json') as file:
+            config = json.load(file)
+            clientURI = config['clients'][0]['redirect_uris'][1]
+
         try:
-            self.httpd = make_server('', 8081, ClientApplication(),
-                                     handler_class=ClientRequestHandler)
-            print("Starting Client app on <http://localhost:8081/>...")
+            self.httpd = make_server(
+                clientURI.rpartition(':')[0].rpartition('/')[2],
+                int(clientURI.rpartition(':')[2].rstrip('/')),
+                ClientApplication(config)
+            )
+            print("Starting Client app on <" + clientURI + ">...")
             self.httpd.serve_forever()
 
         except KeyboardInterrupt:
