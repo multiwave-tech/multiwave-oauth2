@@ -32,33 +32,7 @@ We'll be using _Python_, so let's work something out with the [Python-OAuth2](ht
 	cd multiwave-oauth2/
 	```
 
-3. For this project, we decided to "externalize" the server configuration and clients' secrets. You'll have to configure yours under `oauth2-server/config/config.json`. A basic example would be :
-	```json
-	{
-		"redis_server": {
-				"host": "127.0.0.1",
-				"port": 6379,
-				"db": {
-					"token_store": 0,
-					"client_store": 1
-				}
-		},
-		"auth_server": {
-			"host": "127.0.0.1",
-			"port": 8080
-		},
-		"clients": [
-			{
-				"client_id": "abc",
-				"client_secret": "xyz",
-				"redirect_uris": [
-					"http://localhost:8081/callback",
-					"http://localhost:8081/"
-				]
-			}
-		]
-	}
-	```
+3. For this project, we decided to "externalize" the server configuration and clients' secrets. You'll have to configure yours under `oauth2-server/config/config.json`. A basic example is already present under `config.json.example`.
 
 4. Now, we're all set to run it :
 	```sh
