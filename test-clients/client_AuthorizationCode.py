@@ -23,15 +23,21 @@ class ClientApplication():
     Very basic application that simulates calls to the API of the
     python-oauth2 app.
     """
-    callback_url = 'http://localhost:8081/callback'
-    client_id = 'abc'
-    client_secret = 'xyz'
-    api_server_url = 'http://localhost:8080'
-
     def __init__(self):
         self.access_token = None
         self.auth_token = None
         self.token_type = ''
+
+        # Retrieve configuration from server's sources for our tests
+        with open('oauth2-server/config/config.json') as file:
+            config = json.load(file)
+            self.callback_url = config['clients'][0]['redirect_uris'][0]
+            self.client_id = config['clients'][0]['client_id']
+            self.client_secret = config['clients'][0]['client_secret']
+            self.api_server_url = 'http://{0}:{1}'.format(
+                config['auth_server']['host'],
+                config['auth_server']['port']
+            )
 
     def __call__(self, env, start_response):
         if env['PATH_INFO'] == '/app':
