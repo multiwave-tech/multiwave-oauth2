@@ -1,0 +1,24 @@
+{
+	"redis_server": {
+			"host": "127.0.0.1",
+			"port": 6379,
+			"db": {
+				"token_store": 0,
+				"client_store": 1
+			}
+	},
+	"auth_server": {
+		"host": "127.0.0.1",
+		"port": 8080
+	},
+	"clients": [
+		{
+			"client_id": "abc",
+			"client_secret": "xyz",
+			"redirect_uris": [
+				"http://localhost:8081/callback",
+				"http://localhost:8081/"
+			]
+		}
+	]
+}

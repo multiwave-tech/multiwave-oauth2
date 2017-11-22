@@ -105,4 +105,4 @@ venv.bak/
 
 # End of https://www.gitignore.io/api/python
 
-/oauth2-server/config/*
+/oauth2-server/config/*.json

@@ -90,7 +90,7 @@ class ClientApplication():
         print("Requesting authorization token...")
 
         auth_endpoint = self.api_server_url + '/authorize'
-        query = urlencode({'client_id': 'abc',
+        query = urlencode({'client_id': self.client_id,
                            'redirect_uri': self.callback_url,
                            'response_type': 'code'})
 

@@ -61,13 +61,13 @@ We'll be using _Python_, so let's work something out with the [Python-OAuth2](ht
 4. Now, we're all set to run it :
 	```sh
 	# Run the server
-	python3 oauth2-server/server.py
+	./oauth2-server/server.py
 	# Run the AuthorizationCodeGrant test client
-	python3 tests-clients/client_AuthorizationCode.py
+	./tests-clients/client_AuthorizationCode.py
 	# Run the ImplicitGrant test client
-	python3 tests-clients/client_Implicit.py
+	./tests-clients/client_Implicit.py
 	# Run the CredentialsGrant test client
-	python3 tests-clients/client_CredentialsGrant.py
+	./test-clients/client_ClientCredentials.py
 	```
 
 4. To bind this new server to the 443 port, you could use an _Apache_ or _NGINX_ reverse proxy `your_public_IP:443 <=> 127.0.0.1:8080`.
