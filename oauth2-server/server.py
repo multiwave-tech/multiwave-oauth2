@@ -34,23 +34,10 @@ class TestSiteAdapter(
     This adapter renders a confirmation page so the user can confirm the auth
     request.
     """
-    CONFIRMATION_TEMPLATE = """
-        <!DOCTYPE html>
-        <html>
-        <body>
-            <p>
-                <a href="{url}&confirm=yes">Confirm</a>
-            </p>
-            <p>
-                <a href="{url}&confirm=no">Deny</a>
-            </p>
-        </body>
-        </html>
-    """
-
     def render_auth_page(self, request, response, environ, scopes, client):
-        url = request.path + '?' + request.query_string
-        response.body = self.CONFIRMATION_TEMPLATE.format(url=url)
+        with open('client-template/template.html') as file:
+            response.body = file.read().replace(
+                            '{url}', request.path + '?' + request.query_string)
 
         return response
 
